@@ -118,12 +118,13 @@ Section 1-3 build tasks below are now unblocked.
 
 *Covers spec requirement: "WebSerial-based web tool — customers 'program' what shows on the display (text, images, simple widgets/gauges) directly from the browser."*
 
-### [ ] Task 2.1: WebSerial browser support detection + fallback UX
+### [x] Task 2.1: WebSerial browser support detection + fallback UX
 **Description**: Detect whether the visiting browser supports the Web Serial API before allowing use of the tool.
 **Acceptance Criteria**:
-- Tool checks for `navigator.serial` (or equivalent) on load
-- If unsupported, show a clear message identifying the issue and instructing the user to switch to a Chromium-based browser (Chrome/Edge), per spec's Safari/Firefox note
-- If supported, proceed to connect flow
+- Tool checks for `navigator.serial` (or equivalent) on load ✅
+- If unsupported, show a clear message identifying the issue and instructing the user to switch to a Chromium-based browser (Chrome/Edge), per spec's Safari/Firefox note ✅
+- If supported, proceed to connect flow ✅
+**Verified live** (2026-08-12): deployed to https://electronic-displaykit.josefnordin123.workers.dev and confirmed by a human in real browsers — Chrome shows the connect screen, Safari shows the unsupported-browser message. First task in this project to move from "code reviewed" to genuinely tested end-to-end.
 **Reference**: Constraints — *"WebSerial only works in Chromium-based browsers. Must be flagged/handled in UX, with fallback instructions for Safari/Firefox users."*
 
 ### [ ] Task 2.2: Device connect flow
@@ -301,7 +302,7 @@ a real test label is generated.
 ## Quality Requirements
 - [ ] Stack chosen and confirmed by founder before implementation begins (Task 0.1/0.2) — no task assumes an unconfirmed stack
 - [ ] No features beyond the three Core Features in the spec (no product catalog, no e-ink support, no loyalty/premium extras)
-- [ ] WebSerial fallback UX implemented for non-Chromium browsers (Task 2.1) — not optional
+- [x] WebSerial fallback UX implemented for non-Chromium browsers (Task 2.1) — not optional — verified live 2026-08-12 (Chrome connect screen, Safari fallback message)
 - [ ] WebSerial config schema does not hardcode a single display type (Task 2.6)
 - [ ] Inventory deduction prevents overselling (Task 1.5)
 - [ ] Mobile responsive design on store and product pages
