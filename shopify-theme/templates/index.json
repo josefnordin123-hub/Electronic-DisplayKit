@@ -1,0 +1,12 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "heading": "Round SPI Display Kit",
+        "subheading": "ESP32 + round SPI display + cables + USB-C + 3D-printed enclosure + screws. Program it from your browser."
+      }
+    }
+  },
+  "order": ["hero"]
+}

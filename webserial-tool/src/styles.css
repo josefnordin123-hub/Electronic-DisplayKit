@@ -1,0 +1,195 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+}
+
+#root {
+  flex: 1;
+  display: flex;
+}
+
+.unsupported-screen,
+.supported-placeholder,
+.display-type-select,
+.connect-device {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.unsupported-card {
+  max-width: 32rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.unsupported-copy-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  border: 1px solid currentColor;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+}
+
+.unsupported-copy-link-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.unsupported-copy-link-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.4rem;
+}
+
+.unsupported-copy-link-row button {
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+}
+
+.unsupported-copy-error {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.unsupported-copy-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+/* Display-Type Select (Task 2.2) */
+
+.display-type-card-column {
+  max-width: 32rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.display-type-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.display-type-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  border: 1px solid currentColor;
+  border-radius: 0.5rem;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+}
+
+.display-type-card--selected {
+  outline: 2px solid currentColor;
+  outline-offset: -1px;
+}
+
+.display-type-card input[type='radio'] {
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+.display-type-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.display-type-card-name {
+  font-weight: 600;
+}
+
+.display-type-card-description {
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.display-type-card-meta {
+  font-size: 0.8rem;
+  opacity: 0.65;
+}
+
+/* Connect Device (Task 2.2) */
+
+.connect-card {
+  max-width: 32rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.connect-back-link {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  opacity: 0.85;
+}
+
+.connect-error {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border: 1px solid currentColor;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+}
+
+.connect-error-message {
+  margin: 0;
+}
+
+.connect-success {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border: 1px solid currentColor;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+}
+
+.connect-success-heading {
+  margin: 0;
+  font-weight: 600;
+}
+
+.connect-success-details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 0.75rem;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.connect-success-details dt {
+  opacity: 0.7;
+}
+
+.connect-success-details dd {
+  margin: 0;
+}
+
+.connect-success-next {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}

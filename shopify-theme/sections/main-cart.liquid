@@ -1,0 +1,103 @@
+{% comment %}
+  Cart / Order Summary page — implements the "Cart / Order Summary" step of
+  project-docs/ux-foundation.md §1: single line item, quantity editable
+  inline, running total, explicit "Proceed to Checkout" CTA.
+
+  This is a full CART PAGE (not a slide-out drawer). Either satisfies the
+  IA per the UX doc; a page was chosen here because it works with a plain
+  form submit and native page reload — no AJAX cart API wiring needed to
+  have a genuinely working quantity-update and checkout path. A slide-out
+  drawer would need JS-driven Cart AJAX API calls, which is not built in
+  this Week 1 scaffold — see shopify-theme/README.md.
+
+  Checkout itself (shipping/payment, Tasks 1.3/1.4) is NOT built here —
+  the "Proceed to Checkout" button hands off to Shopify's own hosted
+  checkout, which is out of this scaffold's Week 1 scope by design.
+{% endcomment %}
+
+<section class="cart" data-section-id="{{ section.id }}">
+  <h1 class="cart__title">Your Cart</h1>
+
+  {% if cart.item_count == 0 %}
+    <div class="cart__empty">
+      <p>Your cart is empty.</p>
+      <a href="{{ routes.all_products_collection_url | default: routes.root_url }}" class="cart__continue-link">
+        Back to product
+      </a>
+    </div>
+  {% else %}
+    {% form 'cart', cart, class: 'cart__form', id: 'cart-form' %}
+      <ul class="cart__line-items">
+        {% for item in cart.items %}
+          {% comment %}
+            Stock-aware cap on the quantity input, mirroring the same
+            "block increment, show max available" rule from the Product
+            Page (ux-foundation.md, Cart states table).
+          {% endcomment %}
+          {% if item.variant.inventory_management == 'shopify' and item.variant.inventory_policy == 'deny' %}
+            {% assign max_qty = item.variant.inventory_quantity %}
+          {% else %}
+            {% assign max_qty = nil %}
+          {% endif %}
+
+          <li class="cart__line-item" data-line-item-key="{{ item.key }}">
+            {% if item.image %}
+              <img class="cart__line-item-image" src="{{ item.image | image_url: width: 150 }}" alt="{{ item.title }}">
+            {% endif %}
+
+            <div class="cart__line-item-info">
+              <p class="cart__line-item-title">{{ item.product.title }}</p>
+              {% if item.variant.title != 'Default Title' %}
+                <p class="cart__line-item-variant">{{ item.variant.title }}</p>
+              {% endif %}
+              <p class="cart__line-item-price">{{ item.original_price | money }} each</p>
+
+              {% if max_qty and item.quantity >= max_qty %}
+                <p class="cart__line-item-max-notice">Max available: {{ max_qty }}</p>
+              {% endif %}
+            </div>
+
+            <div class="cart__line-item-qty">
+              <label for="updates_{{ item.key }}" class="visually-hidden">Quantity</label>
+              <input
+                type="number"
+                id="updates_{{ item.key }}"
+                name="updates[{{ item.key }}]"
+                value="{{ item.quantity }}"
+                min="0"
+                {% if max_qty %}max="{{ max_qty }}"{% endif %}
+                inputmode="numeric"
+                data-line-item-qty
+              >
+            </div>
+
+            <p class="cart__line-item-total">{{ item.final_line_price | money }}</p>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <button type="submit" name="update" class="cart__update-btn">
+        Update Cart
+      </button>
+
+      <div class="cart__summary">
+        <p class="cart__running-total">
+          <span>Total</span>
+          <span data-cart-total>{{ cart.total_price | money }}</span>
+        </p>
+        <p class="cart__summary-note">Shipping and taxes calculated at checkout.</p>
+
+        <button type="submit" name="checkout" class="cart__checkout-btn">
+          Proceed to Checkout
+        </button>
+      </div>
+    {% endform %}
+  {% endif %}
+</section>
+
+{% schema %}
+{
+  "name": "Main cart",
+  "settings": []
+}
+{% endschema %}

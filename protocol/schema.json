@@ -1,0 +1,214 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://internal/protocol/schema.json",
+  "title": "WebSerial Protocol v1",
+  "description": "JSON Schema for the WebSerial config protocol between the webserial-tool frontend and ESP32 firmware. Mirrors schema-v1.md and schema.ts — Task 2.6. Validate each NDJSON line against the appropriate $def below (messages are not wrapped in a top-level discriminant beyond their own `type`/descriptor shape).",
+  "definitions": {
+    "protocolVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$",
+      "examples": ["1.0"]
+    },
+    "capabilityDescriptor": {
+      "type": "object",
+      "description": "Device -> host handshake, sent once immediately on connect, before any command.",
+      "properties": {
+        "protocolVersion": { "$ref": "#/definitions/protocolVersion" },
+        "deviceType": { "type": "string", "minLength": 1 },
+        "shape": { "type": "string", "enum": ["round", "rect"] },
+        "resolutionPx": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 1 },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "colorDepth": { "type": "string", "enum": ["rgb565", "rgb888", "1bit"] },
+        "supports": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 0
+        }
+      },
+      "required": ["protocolVersion", "deviceType", "shape", "resolutionPx", "colorDepth", "supports"],
+      "additionalProperties": false
+    },
+    "envelopeBase": {
+      "type": "object",
+      "properties": {
+        "protocolVersion": { "$ref": "#/definitions/protocolVersion" },
+        "id": { "type": "string", "minLength": 1 }
+      },
+      "required": ["protocolVersion", "id"]
+    },
+    "textCommand": {
+      "allOf": [
+        { "$ref": "#/definitions/envelopeBase" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "text" },
+            "text": { "type": "string", "maxLength": 256 },
+            "color": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+            "fontSizePx": { "type": "integer", "minimum": 1 },
+            "align": { "type": "string", "enum": ["left", "center", "right"] }
+          },
+          "required": ["type", "text"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "imageCommand": {
+      "allOf": [
+        { "$ref": "#/definitions/envelopeBase" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "image" },
+            "format": { "type": "string", "enum": ["rgb565", "rgb888", "1bit"] },
+            "widthPx": { "type": "integer", "minimum": 1 },
+            "heightPx": { "type": "integer", "minimum": 1 },
+            "totalChunks": { "type": "integer", "minimum": 1 },
+            "totalBytes": { "type": "integer", "minimum": 1 }
+          },
+          "required": ["type", "format", "widthPx", "heightPx", "totalChunks", "totalBytes"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "imageChunkCommand": {
+      "allOf": [
+        { "$ref": "#/definitions/envelopeBase" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "imageChunk" },
+            "index": { "type": "integer", "minimum": 0 },
+            "data": { "type": "string", "contentEncoding": "base64" }
+          },
+          "required": ["type", "index", "data"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "clockWidgetCommand": {
+      "allOf": [
+        { "$ref": "#/definitions/envelopeBase" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "widget" },
+            "widget": { "const": "clock" },
+            "params": {
+              "type": "object",
+              "properties": {
+                "format": { "type": "string", "enum": ["12h", "24h"] },
+                "showSeconds": { "type": "boolean" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": ["type", "widget", "params"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "gaugeWidgetCommand": {
+      "allOf": [
+        { "$ref": "#/definitions/envelopeBase" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "widget" },
+            "widget": { "const": "gauge" },
+            "params": {
+              "type": "object",
+              "properties": {
+                "min": { "type": "number" },
+                "max": { "type": "number" },
+                "label": { "type": "string", "maxLength": 32 },
+                "unit": { "type": "string", "maxLength": 8 },
+                "value": { "type": "number" }
+              },
+              "required": ["min", "max"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["type", "widget", "params"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "widgetCommand": {
+      "oneOf": [
+        { "$ref": "#/definitions/clockWidgetCommand" },
+        { "$ref": "#/definitions/gaugeWidgetCommand" }
+      ]
+    },
+    "deviceCommand": {
+      "description": "Any valid host -> device command (Tasks 2.3-2.5).",
+      "oneOf": [
+        { "$ref": "#/definitions/textCommand" },
+        { "$ref": "#/definitions/imageCommand" },
+        { "$ref": "#/definitions/imageChunkCommand" },
+        { "$ref": "#/definitions/widgetCommand" }
+      ]
+    },
+    "ackResponse": {
+      "type": "object",
+      "properties": {
+        "protocolVersion": { "$ref": "#/definitions/protocolVersion" },
+        "type": { "const": "ack" },
+        "ackId": { "type": "string", "minLength": 1 },
+        "status": { "const": "ok" }
+      },
+      "required": ["protocolVersion", "type", "ackId", "status"],
+      "additionalProperties": false
+    },
+    "errorResponse": {
+      "type": "object",
+      "properties": {
+        "protocolVersion": { "$ref": "#/definitions/protocolVersion" },
+        "type": { "const": "error" },
+        "ackId": { "type": "string", "minLength": 1 },
+        "status": { "const": "error" },
+        "code": {
+          "type": "string",
+          "description": "Device-origin codes are generated by firmware. Host-origin codes (timeout, descriptor_timeout, port_disconnected_in_flight) are synthesized locally by the host transport layer when nothing arrives over the wire in time — see schema-v1.md §6.2-§6.4. Not wire-restricted to this list; unrecognized codes must be treated as 'unknown'.",
+          "examples": [
+            "parse_error",
+            "unsupported_type",
+            "size_mismatch",
+            "unsupported_format",
+            "chunk_out_of_order",
+            "chunk_missing",
+            "buffer_full",
+            "unknown",
+            "timeout",
+            "descriptor_timeout",
+            "port_disconnected_in_flight"
+          ]
+        },
+        "message": { "type": "string" },
+        "origin": {
+          "type": "string",
+          "enum": ["device", "host"],
+          "description": "Week 2 addition, optional/non-breaking. Absent or 'device' = deserialized from an actual wire message. 'host' = synthesized locally by the transport layer (never sent by firmware). See schema-v1.md §6.3."
+        }
+      },
+      "required": ["protocolVersion", "type", "ackId", "status", "code"],
+      "additionalProperties": false
+    },
+    "deviceResponse": {
+      "description": "Any valid device -> host response to a command (Task 2.3/2.4/2.5's send-confirmation requirement).",
+      "oneOf": [
+        { "$ref": "#/definitions/ackResponse" },
+        { "$ref": "#/definitions/errorResponse" }
+      ]
+    }
+  },
+  "oneOf": [
+    { "$ref": "#/definitions/capabilityDescriptor" },
+    { "$ref": "#/definitions/deviceCommand" },
+    { "$ref": "#/definitions/deviceResponse" }
+  ]
+}

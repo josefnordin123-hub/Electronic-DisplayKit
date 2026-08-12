@@ -1,0 +1,23 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "DIY Display Kit — Single SKU",
+    "theme_version": "0.1.0",
+    "theme_author": "Frontend Developer",
+    "theme_documentation_url": "https://github.com/",
+    "theme_support_url": "https://github.com/"
+  },
+  {
+    "name": "Global",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Single-SKU store"
+      },
+      {
+        "type": "paragraph",
+        "content": "This theme is intentionally scoped to one product. No catalog/collection settings are included by design — see shopify-theme/README.md."
+      }
+    ]
+  }
+]

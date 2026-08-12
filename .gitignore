@@ -1,0 +1,17 @@
+# OS
+.DS_Store
+
+# Node (webserial-tool)
+node_modules/
+dist/
+*.log
+
+# PlatformIO (firmware)
+firmware/.pio/
+
+# Env files (none exist yet, but don't let one slip in later)
+.env
+.env.local
+
+# Claude Code local permission grants — machine/user-specific, not project config
+.claude/settings.local.json

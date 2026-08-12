@@ -1,0 +1,269 @@
+/* Minimal, mobile-first baseline styling for the single-SKU theme skeleton.
+   Not a design system — just enough for Task 1.1's "mobile responsive"
+   acceptance criterion to be genuinely true on a bare skeleton, and to
+   make the states (sold out, low stock, empty cart) visually legible
+   during review. Expected to be replaced/extended by a real theme design
+   pass later. */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #1a1a1a;
+  line-height: 1.5;
+}
+
+.skip-to-content {
+  position: absolute;
+  left: -9999px;
+}
+.skip-to-content:focus {
+  left: 1rem;
+  top: 1rem;
+  z-index: 100;
+  background: #fff;
+  padding: 0.5rem 1rem;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+/* Header — no nav, by design */
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid #e5e5e5;
+}
+.site-header__logo-text {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.site-header__cart-link {
+  text-decoration: none;
+  color: inherit;
+  font-weight: 600;
+}
+.site-header__cart-count {
+  display: inline-block;
+  margin-left: 0.25rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: #1a1a1a;
+  color: #fff;
+  font-size: 0.75rem;
+}
+
+/* Hero (homepage) */
+.hero__inner {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+.hero__cta {
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #1a1a1a;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 0.375rem;
+  font-weight: 600;
+}
+.hero__cta-placeholder {
+  margin-top: 1.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px dashed #999;
+  border-radius: 0.375rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Product page */
+.product {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+@media (min-width: 48rem) {
+  .product {
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+  }
+}
+.product__image {
+  width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+}
+.product__image--placeholder {
+  aspect-ratio: 1 / 1;
+  background: #f0f0f0;
+}
+.product__thumbnails {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.product__thumbnail {
+  width: 4rem;
+  height: 4rem;
+  object-fit: cover;
+  border-radius: 0.25rem;
+}
+.product__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+}
+.product__price {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+}
+.product__description {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+.product__quantity-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+.product__quantity-input {
+  width: 5rem;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+}
+.product__add-to-cart-btn {
+  display: block;
+  width: 100%;
+  padding: 0.9rem;
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.product__add-to-cart-btn[disabled] {
+  background: #ccc;
+  cursor: not-allowed;
+}
+.product__sold-out-notice {
+  color: #b00020;
+  font-weight: 600;
+}
+.product__low-stock-notice {
+  color: #b06a00;
+  font-size: 0.9rem;
+}
+
+/* Cart page */
+.cart {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+.cart__line-items {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+.cart__line-item {
+  display: grid;
+  grid-template-columns: 4rem 1fr auto auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #eee;
+}
+.cart__line-item-image {
+  width: 4rem;
+  height: 4rem;
+  object-fit: cover;
+  border-radius: 0.25rem;
+}
+.cart__line-item-title {
+  margin: 0;
+  font-weight: 600;
+}
+.cart__line-item-variant,
+.cart__line-item-price {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #666;
+}
+.cart__line-item-max-notice {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: #b06a00;
+}
+.cart__line-item-qty input {
+  width: 4rem;
+  padding: 0.4rem;
+}
+.cart__line-item-total {
+  font-weight: 600;
+  margin: 0;
+}
+.cart__update-btn {
+  padding: 0.6rem 1rem;
+  margin-bottom: 1.5rem;
+  background: #fff;
+  border: 1px solid #1a1a1a;
+  border-radius: 0.375rem;
+  cursor: pointer;
+}
+.cart__summary {
+  border-top: 2px solid #1a1a1a;
+  padding-top: 1rem;
+}
+.cart__running-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem;
+}
+.cart__summary-note {
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+  color: #666;
+}
+.cart__checkout-btn {
+  display: block;
+  width: 100%;
+  padding: 0.9rem;
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.cart__empty {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.site-footer__inner {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #666;
+}

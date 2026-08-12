@@ -1,0 +1,117 @@
+{% comment %}
+  Product page — single SKU. Implements the "Product Page" step of
+  project-docs/ux-foundation.md §1 (E-commerce Store flow):
+    - name / description / price / photo
+    - quantity selector (default 1), stock-aware (disables/limits on low stock)
+    - explicit Add to Cart CTA
+    - out-of-stock state: CTA disabled, replaced with "Sold Out"
+
+  Covers Task 1.1 acceptance criteria: product name/description/price/photo
+  shown, working Add to Cart CTA, mobile responsive.
+{% endcomment %}
+
+{% assign current_variant = product.selected_or_first_available_variant %}
+
+<section class="product" data-section-id="{{ section.id }}">
+  <div class="product__media">
+    {% if product.featured_media %}
+      {{ product.featured_media | image_url: width: 1200 | image_tag:
+        loading: 'eager',
+        alt: product.featured_media.alt | default: product.title,
+        class: 'product__image'
+      }}
+    {% else %}
+      <div class="product__image product__image--placeholder" aria-hidden="true"></div>
+    {% endif %}
+
+    {% comment %} Additional photos, per Task 1.1 "photo(s)" plural {% endcomment %}
+    {% if product.media.size > 1 %}
+      <div class="product__thumbnails">
+        {% for media in product.media %}
+          <img
+            class="product__thumbnail"
+            src="{{ media | image_url: width: 200 }}"
+            alt="{{ media.alt | default: product.title }}"
+            loading="lazy"
+          >
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="product__info">
+    <h1 class="product__title">{{ product.title }}</h1>
+
+    <p class="product__price" data-product-price>
+      {{ current_variant.price | money }}
+    </p>
+
+    <div class="product__description">
+      {{ product.description }}
+    </div>
+
+    {% comment %}
+      Stock-aware states per ux-foundation.md:
+      - in stock: normal Add to Cart
+      - out of stock: CTA disabled, replaced with "Sold Out"
+      - low stock: optional per the UX doc ("not required") — shown here as
+        a small notice, doesn't change CTA behavior beyond capping quantity.
+      "notify me" is explicitly flagged as NOT in MVP scope — not built.
+    {% endcomment %}
+
+    {% form 'product', product, class: 'product__form', id: 'product-form' %}
+      <input type="hidden" name="id" value="{{ current_variant.id }}">
+
+      {% if current_variant.available %}
+        {% comment %}
+          inventory_management == "shopify" means Shopify is tracking real
+          stock counts for this variant (Task 1.5's inventory system).
+          If untracked ("blank"), there's no finite count to cap quantity
+          against, so the selector just allows any positive integer.
+        {% endcomment %}
+        {% if current_variant.inventory_management == 'shopify' and current_variant.inventory_policy == 'deny' %}
+          {% assign max_qty = current_variant.inventory_quantity %}
+        {% else %}
+          {% assign max_qty = nil %}
+        {% endif %}
+
+        {% if max_qty and max_qty <= 10 %}
+          <p class="product__low-stock-notice">Only {{ max_qty }} left in stock</p>
+        {% endif %}
+
+        <label for="quantity" class="product__quantity-label">Quantity</label>
+        <input
+          type="number"
+          id="quantity"
+          name="quantity"
+          class="product__quantity-input"
+          value="1"
+          min="1"
+          {% if max_qty %}max="{{ max_qty }}"{% endif %}
+          inputmode="numeric"
+        >
+
+        <button type="submit" name="add" class="product__add-to-cart-btn">
+          Add to Cart
+        </button>
+      {% else %}
+        <p class="product__sold-out-notice" role="status">Sold Out</p>
+        <button type="button" class="product__add-to-cart-btn" disabled aria-disabled="true">
+          Sold Out
+        </button>
+        {% comment %}
+          "Notify me when back in stock" is explicitly out of MVP scope per
+          ux-foundation.md Open Question #4 unless the founder says
+          otherwise — not built here.
+        {% endcomment %}
+      {% endif %}
+    {% endform %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Main product",
+  "settings": []
+}
+{% endschema %}

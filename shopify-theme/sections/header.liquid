@@ -1,0 +1,42 @@
+{% comment %}
+  Single-SKU store header — deliberately has NO navigation menu / catalog
+  links. Per project-docs/ux-foundation.md: "One product, one path. No nav
+  bar full of categories, no search, no filters — anything that implies
+  'browse' is off-spec."
+
+  This header exists only to: show the shop name/logo, and provide a cart
+  link/count so the customer always has a way back to their cart. It is
+  intentionally NOT a full storefront nav bar.
+{% endcomment %}
+
+<header class="site-header" role="banner">
+  <div class="site-header__inner">
+    <a class="site-header__logo" href="{{ routes.root_url }}">
+      {% if section.settings.logo != blank %}
+        {{ section.settings.logo | image_url: width: 200 | image_tag: alt: shop.name }}
+      {% else %}
+        <span class="site-header__logo-text">{{ shop.name }}</span>
+      {% endif %}
+    </a>
+
+    {% comment %} No nav element on purpose — single product, single path. {% endcomment %}
+
+    <a class="site-header__cart-link" href="{{ routes.cart_url }}" aria-label="Cart, {{ cart.item_count }} items">
+      Cart
+      <span class="site-header__cart-count" data-cart-count>{{ cart.item_count }}</span>
+    </a>
+  </div>
+</header>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo (optional)"
+    }
+  ]
+}
+{% endschema %}

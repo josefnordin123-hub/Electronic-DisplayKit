@@ -1,0 +1,57 @@
+{% comment %}
+  Homepage hero for the single-SKU store. Per ux-foundation.md's "no
+  browse" principle, the homepage is not a catalog landing page — it's a
+  single CTA pointing straight at the one product page. The `product`
+  setting is a Shopify product picker so this works from the theme editor
+  without hardcoding a handle.
+{% endcomment %}
+
+<section class="hero">
+  <div class="hero__inner">
+    <h1 class="hero__title">{{ section.settings.heading | default: 'Round SPI Display Kit' }}</h1>
+    {% if section.settings.subheading != blank %}
+      <p class="hero__subheading">{{ section.settings.subheading }}</p>
+    {% endif %}
+
+    {% if section.settings.product != blank %}
+      <a class="hero__cta" href="{{ section.settings.product.url }}">
+        Shop Now — {{ section.settings.product.price | money }}
+      </a>
+    {% else %}
+      {% comment %} Scaffold state: no product picked yet in theme editor. {% endcomment %}
+      <p class="hero__cta-placeholder">
+        Select the store's product in Theme Customizer → Hero section to activate the Shop Now
+        button.
+      </p>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Hero",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Round SPI Display Kit"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading"
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Product to link to (the store's single SKU)"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero"
+    }
+  ]
+}
+{% endschema %}

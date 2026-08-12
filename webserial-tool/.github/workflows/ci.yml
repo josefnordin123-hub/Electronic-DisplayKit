@@ -1,0 +1,68 @@
+name: CI
+
+# Assumes this workflow lives at the root of the webserial-tool repo
+# (i.e. webserial-tool is its own git repo, per the architecture doc's
+# "standalone SPA" decision). If webserial-tool instead ends up as a
+# subfolder of a monorepo, add a `paths:` filter here and a
+# `working-directory: webserial-tool` default under each job.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel superseded runs on the same branch/PR to keep the queue clean.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Install, lint, typecheck, build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # NOTE: no `cache: npm` here on purpose. actions/setup-node's npm
+      # cache requires a committed package-lock.json to compute a cache
+      # key and errors out without one — and no lockfile exists yet (see
+      # below). Evidence Collector caught this as a real Week 2 gap
+      # (2026-08-10): the earlier `npm ci` -> `npm install` fix alone
+      # wasn't enough, this step would still have failed. Re-add
+      # `cache: npm` once a package-lock.json is committed.
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Using `npm install` (not `npm ci`) because no package-lock.json has
+      # been committed yet — this scaffold was built in a sandbox without
+      # Node/npm, so a lockfile was never generated. The FIRST person who
+      # runs `npm install` on a real machine should commit the resulting
+      # package-lock.json, then switch this step back to `npm ci` (and
+      # restore `cache: npm` above) for reproducible, cached installs.
+      - name: Install dependencies
+        run: npm install
+
+      # Runs only if a "lint" script exists in package.json — no-ops
+      # cleanly otherwise instead of failing the build.
+      - name: Lint
+        run: npm run lint --if-present
+
+      # Split out from the "build" npm script (tsc -b && vite build) so a
+      # type error is reported as its own failing step, not buried inside
+      # a generic "build" failure.
+      - name: Typecheck
+        run: npx tsc -b
+
+      - name: Build
+        run: npx vite build
+
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          retention-days: 7
