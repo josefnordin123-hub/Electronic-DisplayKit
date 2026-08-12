@@ -1,31 +1,21 @@
 {
-  // Committed on purpose so `wrangler deploy` stops re-scaffolding a fresh
-  // config on every single build (it was re-running its "first-time Vite
-  // project" setup flow on each deploy because no wrangler.jsonc existed in
-  // the repo — visible in the build logs as "Create wrangler.jsonc" firing
-  // every time). That auto-generated config set
-  // assets.not_found_handling = "single-page-application", which hits a
-  // confirmed Cloudflare platform bug: their own loop-detector false-flags
-  // SPA fallback rules as infinite loops. See:
-  // https://github.com/cloudflare/workers-sdk/issues/10992 (open, this
-  // exact auto-generated-config case) and
-  // https://github.com/cloudflare/workers-sdk/issues/11824 (closed, same
-  // root cause via a plain _redirects file).
-  //
-  // Real fix for later: this app has zero client-side routes right now
-  // (App.tsx just switches screens by React state, no router, everything
-  // lives at one URL) — so SPA fallback isn't actually needed yet. Once a
-  // router/deep-linkable routes get added, re-enable it using the
-  // maintainer-confirmed workaround from #11824: serve index.html under a
-  // different filename (e.g. copy dist/index.html to dist/_index.html at
-  // build time) and point not_found_handling/a _redirects rule at that
-  // renamed file instead of "single-page-application" directly, since that
-  // sidesteps the buggy validator.
+  // Deliberately minimal. Cloudflare's own docs for @cloudflare/vite-plugin
+  // (see vite.config.ts) say NOT to set assets.directory here — the plugin
+  // configures that automatically from the Vite build output. We've also
+  // left out assets.not_found_handling entirely: this app has zero
+  // client-side routes right now (App.tsx switches screens via React state,
+  // no router, everything lives at one URL), so SPA fallback isn't needed
+  // yet, and "single-page-application" is exactly the value that hits a
+  // confirmed, currently-open Cloudflare platform bug — their own
+  // infinite-loop validator false-positives on SPA fallback rules,
+  // including their own auto-generated config. See:
+  // https://github.com/cloudflare/workers-sdk/issues/10992 (open)
+  // https://github.com/cloudflare/workers-sdk/issues/11824 (closed; the
+  // confirmed workaround, once real routing is added and this is needed
+  // again, is serving the fallback from a renamed file like
+  // `_index.html`, not "single-page-application" directly).
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "electronic-displaykit",
   "compatibility_date": "2026-08-12",
-  "compatibility_flags": ["nodejs_compat"],
-  "assets": {
-    "directory": "./dist"
-  }
+  "compatibility_flags": ["nodejs_compat"]
 }
