@@ -65,8 +65,12 @@ means:
       reference doc yet (that's Task 3.2, Week 3, and its own acceptance
       criterion is that it must match real hardware — not be written from
       assumption, same as this file).
-- [ ] **`board = esp32dev` in `platformio.ini` is a generic placeholder.**
-      Swap it once the team's actual ordered board is known.
+- [x] **Board updated 2026-08-12**: `platformio.ini` now targets
+      `esp32-s3-devkitc-1` (N8R8: 8MB Flash / 8MB Octal PSRAM, native
+      USB-C) per the founder's decision — see `project-docs/hardware-bom.md`.
+      Still a placeholder in the sense that pin mapping below is unverified
+      against the real, ordered unit — the board *family* is now locked,
+      the wiring is not.
 - [ ] **`include/lv_conf.h` is a hand-trimmed subset**, not the literal
       template PlatformIO's resolved LVGL version ships with — see the
       header comment in that file for the reconciliation steps if the
@@ -100,7 +104,7 @@ means:
 
 ## Files
 
-- `platformio.ini` — env targeting a generic ESP32 dev board; LVGL,
+- `platformio.ini` — env targeting ESP32-S3-DevKitC-1 (N8R8); LVGL,
   LovyanGFX, and ArduinoJson as `lib_deps`.
 - `include/lv_conf.h` — trimmed LVGL v8.4 config (see its own header
   comment for caveats).
